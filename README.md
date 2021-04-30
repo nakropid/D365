@@ -12,7 +12,7 @@ After deploying D365 Commerce hardware stations in Azure, it may be necessary to
 
 3. Save the script and upload it to an Azure blob container
 
-4. Generate a SAS URL for the script that was just uploaded. Copy the SAS URL for use later.
+4. Generate a read only SAS URL for the script that was just uploaded. Copy the SAS URL for use later.
 
 5. Create an Azure Key Vault if one does not exist and add the script SAS URL as a Key Vault secret.
 
