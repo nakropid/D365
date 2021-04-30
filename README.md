@@ -16,7 +16,7 @@ After deploying D365 Commerce hardware stations in Azure, it may be necessary to
 
 5. Create an Azure Key Vault if one does not exist and add the script SAS URL as a Key Vault secret.
 
-6. Copy the Id of the Key Vault from the "Properties" section of the Key Vault Blade for use later.
+6. Copy the ResourceId of the Key Vault from the "Properties" section of the Key Vault Blade for use later.
 
 7. Edit the following items in the updateHWS-Parameters.json file
   * virtualMachineName array. This parameter can hold multiple values so that many VMs can be updated with a single deployment
