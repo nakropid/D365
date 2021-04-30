@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "String",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "virtualMachineName": {
+            "type": "array"
+        },
+        "cseFileUri": {
+            "type": "securestring"
+        },
+        "utcCustom": {
+            "type": "string",
+            "defaultValue": "[utcNow('MMddyyyyHHmmssff')]"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('virtualMachineName')[copyIndex()],'/installD365HardwareStation')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "timestamp": "[parameters('utcCustom')]",
+                    "fileUris": [
+                        "[parameters('cseFileUri')]"
+                    ],
+                    "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File HWSUpdate.ps1"
+                }
+            },
+            "copy": {
+                "name": "hwsUpdateCopy",
+                "count": "[length(parameters('virtualMachineName'))]"
+            }
+        }
+    ]
+}   

@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachineName": {
+            "value": [
+                "vm1",
+                "vm2",
+                "vm3"
+            ]
+        },
+        "cseFileUri": {
+            "reference": {
+                "keyVault": {
+                    "id": "Id of Key Vault"
+                },
+                "secretName": "Secret Name for the SAS URL"
+            }
+        }
+    }
+}
