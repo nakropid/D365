@@ -29,4 +29,5 @@ After deploying D365 Commerce hardware stations in Azure, it may be necessary to
 Deploy the ARM template using PowerShell
 
 Connect-AzAccount
+
 New-AzResourceGroupDeployment -Name updateHWS01 -ResourceGroupName 'Resoure Group Containing Hardware Stations' -TemplateFile 'Path to updateHWS.json' -TemplateParameterFile 'Path to updateHWS-Parameters.json' -Verbose
