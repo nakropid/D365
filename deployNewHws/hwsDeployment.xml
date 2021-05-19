@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appSettings>
+    <add value="False" key="HardwareStationAllowOpenFirewallPort" />
+    <add value="True" key="HardwareStationAllowUseDefaultAccount" />
+    <add value="" key="HardwareStationCertificateThumbprint" />
+    <add value="" key="HardwareStationHostName" />
+    <add value="443" key="HardwareStationHttpsPort" />
+    <add value="" key="HardwareStationRefRetailServerUrl" />
+  </appSettings>
+</configuration>

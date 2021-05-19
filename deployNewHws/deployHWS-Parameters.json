@@ -1,0 +1,113 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subnetName": {
+            "metadata": {
+                "description": "The name of the subnet where the hardware station should be deployed"
+            },
+            "value": ""
+        },
+        "virtualNetworkId": {
+            "metadata": {
+                "description": "The VNET Id where the hardware station should be deployed. This can be found on the 'Properties' page of the VNET blad in the Azure portal"
+            },
+            "value": ""
+        },
+        "virtualMachineName": {
+            "metadata": {
+                "description": "The name or names of the hardware station VMs. This parameter is an array and can accept multiple, comma separated values"
+            },
+            "value": [
+                ""
+            ]
+        },
+        "adminUsername": {
+            "metadata": {
+                "description": "The local admin username on the hardware station VM(s)"
+            },
+            "value": ""
+        },
+        "adminPassword": {
+            "metadata": {
+                "description": "The key vault Id and secret name storing the local admin password for the hardware station VM(s)"
+            },
+            "reference": {
+                "keyVault": {
+                    "id": ""
+                },
+                "secretName": ""
+            }
+        },
+        "domainFQDN": {
+            "metadata": {
+                "description": "The FQDN to which the hardware station VM(s) should be joined"
+            },
+            "value": ""
+        },
+        "ouPath": {
+            "metadata": {
+                "description": "This parameter is optional. The distinguished name of an Active Directory OU where the hardware stations AD objects should reside"
+            },
+            "value": ""
+        },
+        "domainAdminUPN": {
+            "metadata": {
+                "description": "The domain admin or domain join service account username that should be used to join the hardware station VM(s) to the domain"
+            },
+            "value": ""
+        },
+        "domainAdminPassword": {
+            "metadata": {
+                "description": "The key vault Id and secret name storing the domain admin or domain join service account password being used to join the hardware station VM(s) to the domain"
+            },
+            "reference": {
+                "keyVault": {
+                    "id": ""
+                },
+                "secretName": ""
+            }
+        },
+        "keyvaultId": {
+            "metadata": {
+                "description": "The key vault Id where the hardware station SSL certificate is being stored"
+            },
+            "value": ""
+        },
+        "certificateURL": {
+            "metadata": {
+                "description": "The key vault certificate URL for the hardware station SSL certificate. This can be found in the certificate properties under the 'Secret Identifier' field"
+            },
+            "value": ""
+        },
+        "cseFileUri": {
+            "metadata": {
+                "description": "The key vault Id and secret name storing the SAS URL for the 'HWSDeployment.ps1' script "
+            },
+            "reference": {
+                "keyVault": {
+                    "id": ""
+                },
+                "secretName": ""
+            }
+        },
+        "imagePublisher": {
+            "metadata": {
+                "description": "OS image publisher"
+            },
+            "value": "MicrosoftWindowsServer"
+        },
+        "imageOffer": {
+            "metadata": {
+                "description": "OS image offer"
+            },
+            "value": "WindowsServer"
+        },
+        "imageSku": {
+            "metadata": {
+                "description": "OS image sku"
+            },
+            "value": "2019-Datacenter-core-smalldisk"
+        }
+    }
+}

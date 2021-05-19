@@ -1,0 +1,209 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "String",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "subnetName": {
+            "type": "String"
+        },
+        "virtualNetworkId": {
+            "type": "String"
+        },
+        "virtualMachineName": {
+            "type": "array"
+        },
+        "virtualMachineSize": {
+            "type": "String",
+            "defaultValue": "Standard_B1ms"
+        },
+        "adminUsername": {
+            "type": "String"
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": null
+        },
+        "domainAdminUPN": {
+            "type": "string"
+        },
+        "domainAdminPassword": {
+            "type": "securestring"
+        },
+        "ouPath": {
+            "type": "string",
+            "defaultValue": null
+        },
+        "domainFQDN": {
+            "type": "string"
+        },
+        "domainJoinOptions": {
+            "type": "int",
+            "defaultValue": 3
+        },
+        "certificateURL": {
+            "type": "securestring"
+        },
+        "keyvaultId": {
+            "type": "securestring"
+        },
+        "cseFileUri": {
+            "type": "securestring"
+        },
+        "imagePublisher": {
+            "type": "string"
+        },
+        "imageOffer": {
+            "type": "string"
+        },
+        "imageSku": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "vnetId": "[parameters('virtualNetworkId')]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-05-01",
+            "name": "[concat('nic-01-', parameters('virtualMachineName')[copyIndex()])]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "nicCopy",
+                "count": "[length(parameters('virtualMachineName'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "name": "[parameters('virtualMachineName')[copyIndex()]]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-01-', parameters('virtualMachineName')[copyIndex()]))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[parameters('imagePublisher')]",
+                        "offer": "[parameters('imageOffer')]",
+                        "sku": "[parameters('imageSku')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "[concat('osdisk-', parameters('virtualMachineName')[copyIndex()])]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "diskSizeGB": 64,
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('nic-01-', parameters('virtualMachineName')[copyIndex()]))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')[copyIndex()]]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "secrets": [
+                        {
+                            "sourceVault": {
+                                "id": "[parameters('keyvaultId')]"
+                        },
+                            "vaultCertificates": [
+                                {
+                                    "certificateUrl": "[parameters('certificateURL')]",
+                                    "certificateStore": "My"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            "copy": {
+                "name": "vmCopy",
+                "count": "[length(parameters('virtualMachineName'))]"
+            }
+        },
+        {
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('virtualMachineName')[copyIndex()],'/joindomain')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachineName')[copyIndex()])]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "JsonADDomainExtension",
+                "typeHandlerVersion": "1.3",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "Name": "[parameters('domainFQDN')]",
+                    "OUPath": "[parameters('ouPath')]",
+                    "User": "[parameters('domainAdminUPN')]",
+                    "Restart": true,
+                    "Options": "[parameters('domainJoinOptions')]"
+                },
+                "protectedSettings": {
+                    "Password": "[parameters('domainAdminPassword')]"
+                }
+            },
+            "copy": {
+                "name": "domainJoinCopy",
+                "count": "[length(parameters('virtualMachineName'))]"
+            }
+        },
+        {
+            "apiVersion": "2019-07-01",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('virtualMachineName')[copyIndex()],'/installD365HardwareStation')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('virtualMachineName')[copyIndex()], '/extensions/joindomain'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[parameters('cseFileUri')]"
+                    ],
+                    "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File HWSDeployment.ps1"
+                }
+            },
+            "copy": {
+                "name": "hwsInstallCopy",
+                "count": "[length(parameters('virtualMachineName'))]"
+            }
+        }
+    ]
+}   
