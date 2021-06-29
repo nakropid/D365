@@ -60,11 +60,23 @@
         },
         "imageSku": {
             "type": "string"
+        },
+        "availabilityZone": {
+            "type": "string",
+            "allowedValues": [
+                "1",
+                "2",
+                "3",
+                "Auto Select"
+            ],
+            "defaultValue": "Auto Select"
         }
     },
     "variables": {
         "vnetId": "[parameters('virtualNetworkId')]",
-        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "parsedVMName": "[split(parameters('virtualMachineName'),'-')]",
+        "availabilityZone": "[if(equals(parameters('availabilityZone'),'Auto Select'),add(mod(sub(if(greaterOrEquals(length(variables('parsedVMName')),4),int(variables('parsedVMName')[3]),int(variables('parsedVMName')[1])),1),3),1),parameters('availabilityZone'))]"
     },
     "resources": [
         {
@@ -144,7 +156,10 @@
                             ]
                         }
                     ]
-                }
+                },
+                "zones": [
+                    "[variables('availabilityZone')]"
+                ]
             },
             "copy": {
                 "name": "vmCopy",
