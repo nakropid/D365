@@ -108,6 +108,18 @@
                 "description": "OS image sku"
             },
             "value": "2019-Datacenter-core-smalldisk"
+        },
+        "availabilityZone": {
+            "metadata": {
+                "description": "Availability Zone to deploy VMs to"
+            },
+            "value": "Auto Select"
+        },
+        "cseScriptName": {
+            "metadata": {
+                "description": "Name of PowerShell script to utilize with the Custom Script Extension"
+            },
+            "value": "HWSDeployment.ps1"
         }
     }
 }

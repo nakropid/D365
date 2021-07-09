@@ -70,6 +70,10 @@
                 "Auto Select"
             ],
             "defaultValue": "Auto Select"
+        },
+        "cseScriptName": {
+            "type": "string",
+            "defaultValue": "HWSDeployment.ps1"
         }
     },
     "variables": {
@@ -212,7 +216,7 @@
                     "fileUris": [
                         "[parameters('cseFileUri')]"
                     ],
-                    "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File HWSDeployment.ps1"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ',parameters('cseScriptName'))]"
                 }
             },
             "copy": {
