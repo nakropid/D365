@@ -12,8 +12,6 @@ $Values.configuration.appSettings.ChildNodes.Item(3).value = "$MachineHostname.I
 $Values.configuration.appSettings.ChildNodes.Item(5).value = $HardwareStationRefRetailServerUrl
 $Values.Save($FilePath)
 
-Start-Process msiexec.exe -Wait -NoNewWindow -ArgumentList '/I C:\HWSDeployment\OPOS_CCOs_1.14.001.msi /quiet'
+Start-Process msiexec.exe -Wait -ArgumentList '/I C:\HWSDeployment\OPOS_CCOs_1.14.001.msi /quiet'
 
-Start-Sleep -Seconds 60
-
-Start-Process C:\HWSDeployment\Insert hardware station installer name here.exe -Wait -NoNewWindow -ArgumentList '-S -SkipMerchantInfo -C "C:\HWSDeployment\HWSDeployment.xml"'
+Start-Process C:\HWSDeployment\Insert hardware station installer name here.exe -Wait -ArgumentList '-S -SkipMerchantInfo -C "C:\HWSDeployment\HWSDeployment.xml"'
