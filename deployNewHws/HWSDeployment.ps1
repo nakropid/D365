@@ -12,6 +12,29 @@ $Values.configuration.appSettings.ChildNodes.Item(3).value = "$MachineHostname.I
 $Values.configuration.appSettings.ChildNodes.Item(5).value = $HardwareStationRefRetailServerUrl
 $Values.Save($FilePath)
 
-Start-Process msiexec.exe -Wait -ArgumentList '/I C:\HWSDeployment\OPOS_CCOs_1.14.001.msi /quiet'
+Write-Output "Installing OPOS Common Control Objects..."
 
-Start-Process C:\HWSDeployment\Insert hardware station installer name here.exe -Wait -ArgumentList '-S -SkipMerchantInfo -C "C:\HWSDeployment\HWSDeployment.xml"'
+Start-Process msiexec.exe -Wait -ArgumentList '/I C:\HWSDeployment\OPOS_CCOs_1.14.001.msi /quiet /L*VI! C:\HWSDeployment\OPOS_installer_log.txt'
+
+Get-Content C:\HWSDeployment\OPOS_installer_log.txt
+
+Write-Output "Waiting for msiserver to exit..."
+
+#Uncomment the below line if you are comfortable killing the MSI Server as soon as the OPOS CCO install finishes.
+#Stop-Service msiserver
+$(Get-Service msiserver).WaitForStatus("Stopped")
+
+Write-Output "Installing Retail Hardware Station..."
+
+Start-Process C:\HWSDeployment\Insert hardware station installer name here.exe -Wait -NoNewWindow -ArgumentList '-S -SkipMerchantInfo -C "C:\HWSDeployment\HWSDeployment.xml" -V -LogFile C:\HWSDeployment\HWS_installer_log.txt'
+
+$HWSInstallerLog = $(Get-Content C:\HWSDeployment\HWS_installer_log.txt)
+
+$HWSInstallerLog
+
+$HWSInstallerLogPath = $HWSInstallerLog[-1].Substring($HWSInstallerLog[-1].IndexOf('"')).Replace('"','')
+
+foreach($HWSInstallerLogFile in $(Get-ChildItem $HWSInstallerLogPath).FullName) {
+    Write-Output "Logfile: $HWSInstallerLogFile"
+    Get-Content $HWSInstallerLogFile
+}
