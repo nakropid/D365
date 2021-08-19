@@ -28,13 +28,4 @@ Write-Output "Installing Retail Hardware Station..."
 
 Start-Process C:\HWSDeployment\Insert hardware station installer name here.exe -Wait -NoNewWindow -ArgumentList '-S -SkipMerchantInfo -C "C:\HWSDeployment\HWSDeployment.xml" -V -LogFile C:\HWSDeployment\HWS_installer_log.txt'
 
-$HWSInstallerLog = $(Get-Content C:\HWSDeployment\HWS_installer_log.txt)
-
-$HWSInstallerLog
-
-$HWSInstallerLogPath = $HWSInstallerLog[-1].Substring($HWSInstallerLog[-1].IndexOf('"')).Replace('"','')
-
-foreach($HWSInstallerLogFile in $(Get-ChildItem $HWSInstallerLogPath).FullName) {
-    Write-Output "Logfile: $HWSInstallerLogFile"
-    Get-Content $HWSInstallerLogFile
-}
+Get-Content C:\HWSDeployment\HWS_installer_log.txt
